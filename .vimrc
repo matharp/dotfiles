@@ -23,6 +23,7 @@ Plugin 'ShowTrailingWhitespace'
 Plugin 'dhruvasagar/vim-table-mode'
 Plugin 'andviro/flake8-vim'
 Plugin 'VimCalc'
+Plugin 'Lokaltog/vim-easymotion'
 
 call vundle#end()
 filetype plugin indent on
@@ -46,6 +47,10 @@ set number
 set encoding=utf-8
 set hidden
 set backspace=indent,eol,start
+
+set wrap
+set linebreak
+set nolist
 
 set shiftwidth=4
 set tabstop=8
