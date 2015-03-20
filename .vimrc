@@ -14,15 +14,10 @@ Plugin 'bling/vim-airline'
 Plugin 'scrooloose/nerdtree'
 Plugin 'altercation/vim-colors-solarized'
 Plugin 'scrooloose/nerdcommenter'
-Plugin 'EasyMotion'
 Plugin 'snipMate'
 Plugin 'CRefVim'
-Plugin 'surround.vim'
 Plugin 'godlygeek/tabular'
-Plugin 'ShowTrailingWhitespace'
 Plugin 'dhruvasagar/vim-table-mode'
-Plugin 'andviro/flake8-vim'
-Plugin 'VimCalc'
 Plugin 'Lokaltog/vim-easymotion'
 
 call vundle#end()
@@ -32,12 +27,11 @@ colorscheme solarized
 set background=dark
 
 if has('gui_running')
+    set guioptions=-m
+    set guioptions=-t
+    set guifont=Ubuntu\ Mono\ derivative\ Powerline\ 13
     if has('gui_gtk2')
-        set guifont=Inconsolata\ 12
     elseif has('gui_win32')
-        set guioptions-=m
-        set guioptions-=T
-        set guioptions-=r
         set guifont=DejaVu_Sans_Mono_for_Powerline:h12:cANSI
         au GUIEnter * simalt ~x
     endif
@@ -71,7 +65,6 @@ set mouse=a
 set ruler
 set laststatus=2
 set smartcase
-set nowrap
 set wildmenu
 set title
 set history=100
@@ -116,14 +109,19 @@ noremap <leader>ll :source $HOME/.vimrc<CR>
 noremap <leader>y "+y
 noremap <leader>p "+p
 noremap <leader>q :NERDTreeToggle <CR>
-noremap <leader>m :make <CR>
+noremap <leader>m :silent make\|redraw!\|cc <CR>
 nmap <M-j> mz:m+<CR>`z
 nmap <M-k> mz:m-2<CR>`z
 nmap <Leader>cref <Plug>CRV_CRefVimInvoke
+
+inoremap <C-w> <C-\><C-o>dB
+inoremap <C-BS> <C-\><C-o>db
 
 let g:NERDTreeWinPos = 'left'
 let g:NERDTreeWinSize = '24'
 let g:NERDTreeQuitOnOpen = 'false'
 let g:NERDTreeChDirMode = '1'
 let g:NERDTreeShowBookmarks = '1'
-let NERDTreeIgnore=['\.exe$']
+
+let g:table_mode_header_fillchar = '='
+let g:table_mode_corner_corner = '+'
