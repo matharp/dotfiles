@@ -1,125 +1,130 @@
-"----------------
-"Pratham's .vimrc
-"----------------
+" ----------------
+" Pratham's .vimrc (trimmed)
+" ----------------
 
+" Modern behavior.
 set nocompatible
-filetype off
 
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-
-"List of plugins to be installed by Vundle
-Plugin 'gmarik/Vundle.vim'
-Plugin 'scrooloose/nerdtree'
-Plugin 'Lokaltog/vim-easymotion'
-Plugin 'junegunn/fzf.vim'
-Plugin 'junegunn/fzf'
-
-call vundle#end()
-filetype plugin indent on
-
-if has('gui_running')
-    autocmd GUIEnter * set vb t_vb=
-    set guioptions=-m
-    set guioptions=-t
-    if has('gui_gtk2')
-    elseif has('gui_win32')
-        set guifont=DejaVu_Sans_Mono_for_Powerline:h11:cANSI
-        au GUIEnter * simalt ~x
-    endif
+" vim-plug (optional): works if installed, no hard failure on clean systems.
+if filereadable(expand('~/.vim/autoload/plug.vim'))
+  source ~/.vim/autoload/plug.vim
+  call plug#begin('~/.vim/plugged')
+  Plug 'preservim/nerdtree', {'on': ['NERDTree', 'NERDTreeToggle', 'NERDTreeFind']}
+  Plug 'easymotion/vim-easymotion'
+  Plug 'junegunn/fzf.vim', {'on': ['Files', 'GFiles', 'Buffers', 'History', 'Helptags', 'Maps', 'Commands', 'Lines', 'BLines', 'Rg', 'Ag']}
+  Plug 'junegunn/fzf', {'on': ['Files', 'GFiles', 'Buffers', 'History', 'Helptags', 'Maps', 'Commands', 'Lines', 'BLines', 'Rg', 'Ag']}
+  call plug#end()
 endif
 
-set encoding=utf-8
+filetype plugin indent on
+syntax enable
+
+" Core editing defaults.
 set hidden
-set backspace=indent,eol,start
-
-set wrap
+set number
+set relativenumber
+set nowrap
 set linebreak
-set nolist
-
 set shiftwidth=4
 set tabstop=8
-set expandtab
 set softtabstop=4
-"save marks for 100 files and save global marks; f0 for disabling global
-set viminfo='100,f1
-set t_Co=256
-set cursorline
-set matchtime=2
-set matchpairs+=<:>
-set incsearch
-set hlsearch
-set showmatch
-set showcmd
+set expandtab
 set autoindent
 set smartindent
 set mouse=a
-set ruler
-set laststatus=2
 set ignorecase
+set smartcase
+set incsearch
+set hlsearch
+set showmatch
 set wildmenu
-set title
-set history=100
-set noshowmode
-set nospell
-set textwidth=0
-set wrapmargin=0
-
-set foldcolumn=0
-set foldmethod=indent
-set foldnestmax=10
-set foldlevelstart=99
-
-set backup
-set backupdir=$HOME/.vim/backup
-set backupext=~
-set confirm
-set autochdir
+set completeopt=menuone,noselect
+set shortmess+=c
+set signcolumn=auto
+set updatetime=300
+set timeoutlen=400
 set splitright
+set splitbelow
+set scrolloff=4
+set sidescrolloff=8
+set foldmethod=manual
+set foldcolumn=0
+set confirm
+set backup
+set backupext=~
+set undofile
 
-set equalalways
-set winfixwidth
+" Session/history compatibility (Vim/Neovim).
+if has('nvim')
+  set shada='100,f1
+else
+  set viminfo='100,f1
+endif
 
-syntax enable
+" Enable truecolor when available.
+if has('termguicolors')
+  set termguicolors
+endif
 
-highlight ShowTrailingWhitespace guibg=SlateBlue
-highlight Search guibg='#FF0090'
-let g:airline_powerline_fonts=1
-au BufRead,BufNewFile *.md set filetype=markdown
-autocmd BufEnter * lcd %:p:h
+" Fresh-install safety: create dirs as needed.
+if !isdirectory(expand('~/.vim/backup'))
+  call mkdir(expand('~/.vim/backup'), 'p')
+endif
+set backupdir=$HOME/.vim/backup
 
-inoremap jj <ESC>
+if !isdirectory(expand('~/.vim/undo'))
+  call mkdir(expand('~/.vim/undo'), 'p')
+endif
+set undodir=$HOME/.vim/undo
+
+" Clipboard integration when available.
+if has('clipboard')
+  set clipboard=unnamedplus
+endif
+
+" Small helper: run command only when it exists.
+function! s:RunIfCommandExists(cmd, missing_msg) abort
+  if exists(':' . a:cmd)
+    execute a:cmd
+  else
+    echo a:missing_msg
+  endif
+endfunction
+
+" Filetype-specific wrapping for prose.
+augroup pratham_vimrc_autocmds
+  autocmd!
+  autocmd FileType markdown,text,gitcommit setlocal wrap linebreak
+  autocmd FileType * if index(['markdown','text','gitcommit'], &filetype) < 0 | setlocal nowrap | endif
+augroup END
+
+" Keymaps (minimal + high-value).
 let mapleader=','
-noremap <leader>rr :edit $HOME/.vimrc<CR>
-noremap <leader>[[ :CSnext <CR>
-noremap <leader>ll :source $HOME/.vimrc<CR>
-noremap <leader>y "+y
-noremap <leader>p "+p
-noremap <leader>q :NERDTreeToggle<CR>
-noremap <leader>m :silent make\|redraw!\|cc <CR>
-nmap <M-j> mz:m+<CR>`z
-nmap <M-k> mz:m-2<CR>`z
-nmap <Leader>cref <Plug>CRV_CRefVimInvoke
-noremap <leader>d :r !date<CR>
-" insert date
-"basic date
-nmap <F3> i<C-R>=strftime("%Y%m%d")<CR><Esc>
-imap <F3> <C-R>=strftime("%Y%m%d")<CR>
-"date with extra info
-nmap <F4> i<C-R>=strftime("%Y%m%d %a %H:%M")<CR><Esc>
-imap <F4> <C-R>=strftime("%Y%m%d %a %H:%M")<CR>
+inoremap jj <ESC>
+nnoremap <leader>rr :edit $HOME/.vimrc<CR>
+nnoremap <leader>ll :source $HOME/.vimrc<CR>
 
-inoremap <C-w> <C-\><C-o>dB
-inoremap <C-BS> <C-\><C-o>db
+if has('clipboard')
+  nnoremap <leader>y "+y
+  nnoremap <leader>p "+p
+else
+  nnoremap <leader>y y
+  nnoremap <leader>p p
+endif
 
-" map typo
+nnoremap <silent> <leader>q :call <SID>RunIfCommandExists('NERDTreeToggle', 'NERDTree not available')<CR>
+nnoremap <leader>m :silent make\|redraw!\|cc <CR>
+nnoremap <M-j> mz:m+<CR>`z
+nnoremap <M-k> mz:m-2<CR>`z
+nnoremap <leader>d :r !date<CR>
+
+inoremap <C-w> <C-\\><C-o>dB
+inoremap <C-BS> <C-\\><C-o>db
 cmap wq1 wq!
 
+" NERDTree behavior.
 let g:NERDTreeWinPos = 'left'
-let g:NERDTreeWinSize = '24'
-let g:NERDTreeQuitOnOpen = 'false'
-let g:NERDTreeChDirMode = '1'
-let g:NERDTreeShowBookmarks = '1'
-
-let g:table_mode_header_fillchar = '='
-let g:table_mode_corner_corner = '+'
+let g:NERDTreeWinSize = 24
+let g:NERDTreeQuitOnOpen = 0
+let g:NERDTreeChDirMode = 1
+let g:NERDTreeShowBookmarks = 1
